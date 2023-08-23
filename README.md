@@ -13,7 +13,5 @@ to make a link:
 ![p'cture of a giraffe](giraffe.png) where giraffe.png is a file in the repository with the image in it
 
 ```python
-buraya kod ekleyebilirsin
-
-
+you can add your code here
 ```
