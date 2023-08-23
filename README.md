@@ -7,4 +7,6 @@
 **makes bold face**
 *italic*
 to make a link:
-[click here for my github page]https://ilaydabekircan.github.io
+[click here for my github page](https://ilaydabekircan.github.io)
+
+![picture of a giraffe](link to picture of giraffe)
