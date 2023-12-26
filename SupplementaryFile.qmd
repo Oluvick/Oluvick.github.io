@@ -1,0 +1,708 @@
+---
+title: "Statistical Analysis of Customer Credit Card Attrition"
+author: "Victoria Agboola, Ilayda Bekircan"
+format: pdf
+editor: visual
+---
+
+## RESULTS
+
+In the forthcoming analysis, we will initiate by incorporating essential libraries, 'tidyverse' for data manipulation and 'ggplot2' for visualization, into the R programming environment. This is to prepare for the examination of the 'BankChurners' dataset, ensuring the tools for efficient data handling are in place. Subsequently, the dataset will be loaded and a preliminary summary will be procured to provide an insight into the data's fundamental characteristics. The initial assessment will conclude with a quantification of missing values within the dataset, which is a critical step in validating the data quality before proceeding with further detailed analysis."
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+data.bank <- read.csv("/Users/ilaydabekircan/Documents/STAT/Project/BankChurners.csv")
+```
+
+```{r}
+summary(data.bank)
+```
+
+```{r}
+sum(is.na(data.bank))
+
+```
+
+We have zero missing values in the dataset.
+
+Continuing with the data cleaning phase of our project, we dropped the CLIENTNUM column along with the last two columns from our dataset. These fields were removed as part of our data cleaning process since they are irrelevant to the analysis at hand.
+
+Upon cleaning the data, we then proceeded to calculate a correlation matrix to explore the relationships between all numeric variables. Notably, we identified a high correlation value between 'Credit_Limit' and 'Avg_Open_To_Buy', pinpointing a significant relationship that warrants further investigation due to its relevance in assessing customer credit utilization patterns.
+
+```{r}
+# Dropping the CLIENTNUM column using Base R
+data.bank <- data.bank[, -which(names(data.bank) == "CLIENTNUM")]
+# Dropping the last two columns
+data.bank <- data.bank[, -c((ncol(data.bank)-1), ncol(data.bank))]
+summary(data.bank)
+```
+
+```{r}
+(correlation_matrix <- cor(data.bank[sapply(data.bank, is.numeric)]))
+```
+
+```{r}
+#correlation between Credit_Limit and Avg_Open_To_Buy
+print(correlation_matrix[9, "Credit_Limit"])
+```
+
+The presence of a high correlation coefficient of 0.996 between 'Credit_Limit' and 'Avg_Open_To_Buy' indicates a strong multicollinearity, which is problematic for logistic regression analysis due to the risk of unstable estimates and model overfitting. To mitigate this issue, a prudent step in our analysis will be to exclude the 'Avg_Open_To_Buy' variable from the dataset, thereby simplifying the model and enhancing its interpretability and reliability.
+
+```{r}
+data.bank <- data.bank[, -which(names(data.bank) == "Avg_Open_To_Buy")]
+```
+
+The code is encoding the response variable 'Attrition_Flag' by assigning '0' to existing customers and '1' to attrited customers in the dataset.
+
+```{r}
+data.bank$Attrition_Flag <- as.factor(ifelse(data.bank$Attrition_Flag == "Existing Customer", 0, 1))
+table(data.bank$Attrition_Flag)
+```
+
+The next step in our data preparation is to convert certain variables in the dataset into factors to facilitate categorical analysis.
+
+```{r}
+
+data.bank$Gender <- as.factor(data.bank$Gender)
+data.bank$Education_Level <- as.factor(data.bank$Education_Level)
+data.bank$Marital_Status <- as.factor(data.bank$Marital_Status)
+data.bank$Income_Category <- as.factor(data.bank$Income_Category)
+data.bank$Card_Category <- as.factor(data.bank$Card_Category)
+
+
+```
+
+### Visualization of Demographic Variables in the Banking Dataset
+
+In this phase of our analysis, we engage in visual data exploration to uncover underlying patterns and distributions within the customer demographics. Utilizing ggplot2, a versatile tool for crafting informative graphics, we create a bar chart that cross-references education levels with marital status, allowing us to observe the distribution of educational attainment within different marital categories. Following this, we employ boxplots to compare customer age distributions across various education levels, and similarly across income categories. These visualizations are instrumental in revealing potential trends and anomalies in the data, such as age diversity within education brackets and income groups, which could be pivotal for subsequent predictive modeling and hypothesis testing. The minimalistic theme applied ensures that our visuals are clear and uncluttered, directing focus to the data itself.
+
+```{r}
+
+# Bar chart comparing the counts of Education Level within each Marital Status category
+ggplot(data.bank, aes(x = Education_Level, fill = Marital_Status)) +
+  geom_bar(position = "dodge") +
+  labs(x = "Education Level", y = "Count", fill = "Marital Status") +
+  theme_minimal()
+
+```
+
+The bar chart presents a comparison of education levels across different marital status categories within a banking dataset. It is observed that the 'Married' category shows the highest counts across almost all education levels, particularly prominent within the 'Graduate' level. 'Single' and 'Divorced' statuses have similar distributions, though 'Single' individuals appear to have a slightly higher representation in the 'Doctorate' and 'Post-Graduate' categories. The 'Unknown' marital status presents the lowest counts across educational levels, which could indicate either a smaller sample size or a lack of data capture for these individuals. Notably, there are very few 'Uneducated' individuals, suggesting a customer base with at least some level of formal education. The chart enables a visual assessment of the relationship between marital status and education level within the bank's clientele, which could be indicative of the socioeconomic patterns that might influence banking behavior or product preferences.
+
+```{r}
+# Boxplot comparing Customer Age across different Education Levels
+ggplot(data.bank, aes(x = Education_Level, y = Customer_Age, fill = Education_Level)) +
+  geom_boxplot() +
+  labs(x = "Education Level", y = "Customer Age") +
+  theme_minimal()
+
+```
+
+The boxplot illustrates the age distribution of customers across different education levels. Each education category shows a distinct age profile, with the median age generally rising from 'High School' to 'Post-Graduate' levels. The 'Doctorate' level exhibits a notably higher age range, which may reflect the time required to attain this level of education. The categories 'Uneducated' and 'Unknown' demonstrate variability in age, as seen by the spread of the boxes and whiskers. Outliers are present, particularly in the 'Post-Graduate' category, indicating a few customers significantly older than the average. This visualization aids in understanding the age demographics associated with educational attainment among the bank's clientele.
+
+```{r}
+# Boxplot comparing Customer Age across different Income Category
+ggplot(data.bank, aes(x = Income_Category, y = Customer_Age, fill = Income_Category)) +
+  geom_boxplot() +
+  labs(x = "Income Category", y = "Customer Age") +
+  theme_minimal()
+```
+
+The boxplot visualizes the age distribution of customers across various income categories. The median ages are relatively consistent across income brackets, with the exception of the highest income group (\$120K+), which tends to be older. The age range (interquartile range) for the \$60K-\$80K and \$80K-\$120K categories is narrower, suggesting less variability in age within these groups. Notably, there are outliers in the lower income category, indicating a few significantly younger or older customers than the median age group. This chart is critical for understanding the relationship between age and income, which can inform targeted marketing and customer service strategies.
+
+```{r}
+# Age distribution of bank customers
+ggplot(data.bank, aes(x = Customer_Age)) +
+  geom_histogram(bins = 30, fill = "blue", color = "white") +
+  labs(x = "Customer Age", y = "Frequency") +
+  theme_minimal()
+```
+
+The histogram displays the age distribution of the bank's customer base. The data skews towards middle-aged customers, with the highest frequency in the 40-50 age range. A noticeable decline in frequency is observed as age increases beyond 50 years. The distribution suggests that the bank's clientele is predominantly in the mid-life stage, which may reflect the bank's market focus or the financial life stages at which customers are most engaged with the bank's services. This age profile provides insights into the customer demographics and can be integral to tailoring financial products and marketing strategies.
+
+```{r}
+ggplot(data.bank, aes(x = Credit_Limit, fill = Gender)) +
+  geom_density(alpha = 0.7) +
+  labs(x = "Credit Limit", y = "Density", fill = "Gender") +
+  theme_minimal()
+```
+
+The density plot illustrates the distribution of credit limits among customers, segmented by gender. Both distributions appear to follow a similar pattern, with the majority of credit limits concentrated at the lower end of the spectrum. However, there is a noticeable difference in the tails of the distributions, suggesting potential variations in credit limit allocation between genders. Such insights could be instrumental in assessing the bank's credit issuance policies and ensuring equitable financial services across different customer groups.
+
+```{r}
+ggplot(data.bank, aes(x = Attrition_Flag)) +
+  geom_bar(aes(fill = Attrition_Flag)) +
+  labs(x = "Attrition Flag", y = "Count", fill = "Attrition Status") +
+  theme_minimal()
+```
+
+The bar chart portrays the count of existing and attrited customers within the dataset. A significant majority are existing customers (indicated by 0), while a smaller proportion represent attrited customers (indicated by 1). This suggests a stable customer base, with attrition affecting a relatively small segment of the population. Understanding the factors contributing to this attrition could be valuable for customer retention strategies.
+
+The series of visualizations collectively offer a comprehensive demographic overview of the bank's customer base, highlighting key patterns that could be pivotal for strategic decision-making. The distribution of education levels and age across marital statuses reveals a customer base with a diverse educational background and a concentration in middle age. Income comparisons suggest a uniform age distribution across most income brackets, with the exception of the highest earners who tend to be older. The age histogram confirms this middle-aged skew, which aligns with the prime earning years. The credit limit distribution by gender indicates similar patterns for both men and women, with a tail suggesting possible disparities in credit allocation. Lastly, the attrition status chart underscores a significant base of existing customers with a smaller, yet noteworthy, segment of attritions. These insights provide a crucial foundation for the bank to tailor its products and services effectively, address potential disparities, and devise targeted retention and acquisition strategies to strengthen its market position.
+
+To ensure reproducibility, we establish a random seed before proceeding to split the dataset into distinct training and testing sets.
+
+```{r}
+# setting seed before splitting train and test sets
+set.seed(42)
+ratio <- 0.80
+train_set <- sort(sample(1:nrow(data.bank), ceiling(nrow(data.bank)*ratio)))
+
+# creating train and test set
+data.train <- data.bank[train_set, ]
+data.test  <- data.bank[-train_set, ]
+```
+
+The code calculates and compares the proportions of a binary target variable across the full, training, and test datasets. Ensuring consistent distribution is crucial for model validity and to prevent training bias, as discrepancies can lead to poor model generalization to new data.
+
+```{r}
+# 0 and 1 ratio of data, train and test
+(summary(data.bank$Attrition_Flag) / nrow(data.bank))
+(summary(data.train$Attrition_Flag) / nrow(data.train))
+(summary(data.test$Attrition_Flag) / nrow(data.test))
+```
+
+The results indicate a consistent distribution of the binary target variable across the full dataset, training set, and test set.
+
+### Model 1: Logistic Regression
+
+**Fitting a Null Logit Model**
+
+The purpose of this operation is to create a simple starting point for more complex analysis. By setting up a basic model that predicts outcomes based on no information other than the distribution of the outcomes themselves, we can measure how much better we do when we start adding more information to the model.
+
+```{r}
+logit.null <- glm(Attrition_Flag ~ 1, 
+                  data = data.train, 
+                  family = binomial(link = "logit"))
+summary(logit.null)
+```
+
+The output presents the summary of a null logistic regression model, which has been fitted to a training dataset. The model's intercept is estimated at -1.65669 with a standard error of 0.03029, and the z-value of -54.7 indicates that the intercept is significantly different from zero with a p-value of less than 2e-16. The highly significant intercept suggests that even without any predictors, the model can reliably estimate the log odds of the baseline category of the binary response variable. The null deviance and residual deviance both stand at 7130 on 8101 degrees of freedom, offering a measure of model fit that can be used for comparison with more complex models. The Akaike Information Criterion (AIC) is 7132, providing a baseline for evaluating the relative quality of future models on the same data. The model reached convergence after three iterations of the Fisher Scoring algorithm, indicating a stable solution was found for the estimated coefficients.
+
+```{r}
+library(caret)
+```
+
+Checking model performance
+
+```{r}
+pred.logit_null <- predict(logit.null, newdata = data.test, type="response")
+
+condition.logit_null <- ifelse(pred.logit_null > 0.5, 1, 0)
+(confusion_matrix.logit_null <- confusionMatrix(reference = as.factor(data.test$Attrition_Flag), 
+                                                data = as.factor(condition.logit_null), 
+                                                positive = "1",
+                                                mode="everything"))
+```
+
+The model predicted all customers as existing (negative class), failing to identify any attrited customers (positive class). Despite an overall accuracy of 83.75%, which matches the proportion of existing customers, the model lacks true predictive ability, as indicated by a sensitivity of 0 and a Kappa statistic of 0. Essentially, it didn't correctly predict any customer attrition. The high specificity of 1 is misleading since it merely reflects the model's bias towards predicting the majority class. McNemar's test confirms the model's poor performance with a significant p-value.
+
+Computing Area Under Curve (AUC) for the model's predictions
+
+```{r}
+library(pROC)
+auc(data.test$Attrition_Flag, pred.logit_null)
+```
+
+An AUC of 0.5 suggests that the model performs no better than random chance in distinguishing between existing and attrited customers.
+
+**Fitting a Full Logit Model**
+
+We fit a full model using all the variables
+
+```{r}
+logit.full <- glm(Attrition_Flag ~ ., 
+                  data = data.train, 
+                  family = binomial(link = "logit"))
+summary(logit.full)
+```
+
+The logistic regression output describes the relationship between various customer attributes and the likelihood of customer attrition at a bank. Significant predictors include gender, having dependents, marital status, income category, total relationship with the bank, months of inactivity, number of contacts in the last 12 months, credit limit, total revolving balance on the credit card, total transaction amount, total transaction count, and the change in transaction count.
+
+In a practical banking context, this model suggests that male customers (indicated by 'GenderM') are less likely to leave the bank compared to females, as the coefficient is negative and significant. Similarly, customers with a higher number of dependents are more likely to stay with the bank. Those with a 'Doctorate' education level show a greater tendency to stay, while married customers are less likely to attrite compared to their single or unknown marital status counterparts.
+
+Income plays a role, with customers earning less than \$40K or in the \$40K to \$60K bracket being less likely to leave compared to higher-income groups, perhaps indicating a reliance on the bank's services that increases retention. The negative coefficient for 'Total_Relationship_Count' suggests that the more products a customer has with the bank, the less likely they are to leave. 'Months_Inactive_12_mon' and 'Contacts_Count_12_mon' are positively associated with attrition, indicating that customers who are less engaged or have had more required contacts with the bank are at higher risk of leaving.
+
+From a managerial perspective, these findings can inform targeted retention strategies. Marketing professionals might focus on retaining higher-income earners or re-engaging inactive customers. Risk managers could consider these variables when assessing the bank's stability in terms of customer base. Customer relationship managers could use this information to prioritize engagement with segments at higher risk of attrition.
+
+The reduction in the residual deviance from 7130 to 3804 compared to the null model and a lower AIC value suggests a good fit for the model. However, while statistically significant, the practical significance must be evaluated in the context of the bank's operations and strategy to determine actionable insights.
+
+**Full Logistic Regression Model Performance**\$
+
+```{r}
+pred.logit_full <- predict(logit.full, newdata = data.test, type="response")
+
+condition.logit_full <- ifelse(pred.logit_full > 0.5, 1, 0)
+(confusion_matrix.logit_full <- confusionMatrix(reference = as.factor(data.test$Attrition_Flag), 
+                                                data = as.factor(condition.logit_full), 
+                                                positive = "1",
+                                                mode="everything"))
+```
+
+The model demonstrates strong predictive power with 90.52% accuracy, significantly surpassing the baseline rate of random chance predictions. It excels in identifying those who will continue as customers (specificity of 96.99%), but less so in pinpointing those likely to leave (sensitivity of 57.14%). The model is correct 78.66% of the time when predicting customer attrition (precision), and the F1 score of 0.66197 indicates a balanced model considering both precision and recall. For a bank, this model is a robust tool for informing retention strategies, accurately flagging a majority of loyal customers and identifying a substantial portion of those at risk of attrition.
+
+Computing AUC for the full model
+
+```{r}
+auc(data.test$Attrition_Flag, pred.logit_full)
+```
+
+The Area Under the Curve (AUC) of 0.9332 from the ROC analysis indicates a very good ability of the model to distinguish between customers who will stay and those who will attrite. This high AUC value suggests that the model has a strong predictive accuracy in a real-world banking scenario, being able to effectively identify customers at risk of attrition.
+
+After assessing our logistic regression model's ability to predict customer attrition, we checked for multicollinearity to ensure the predictors' independence. Following this, we applied a stepwise regression to streamline the model, potentially improving its interpretability without losing predictive power. Finally, we compared this refined model against the original to confirm any enhancements, aiming for a balance of accuracy and simplicity for practical use in customer retention strategies.
+
+**Checking for Multicollinearity**
+
+```{r}
+car::vif(logit.full)
+```
+
+The output indicates that all predictor variables in the logistic regression model have Generalized Variance Inflation Factor (GVIF) values well below the common threshold of 10, even after adjustment for degrees of freedom. This suggests that multicollinearity is not a concern for this model, indicating that each variable contributes independently to the prediction of customer attrition. This is a positive sign for the model's validity, as it implies that the predictors can be reliably used to assess their individual impact on the likelihood of customer attrition.
+
+**Stepwise Regression Model**
+
+We employ a stepwise regression function, which iteratively adds or removes variables based on specified criteria, such as the Akaike information criterion (AIC) or Bayesian information criterion (BIC). This technique aims to identify a simpler model that retains predictive power with fewer variables, thereby enhancing the interpretability and generalizability of the model.
+
+```{r}
+logit.both <- step(logit.null, list(lower=formula(logit.null),
+                                    upper=formula(logit.full)),
+                                    direction="both",
+                                    trace=0, 
+                                    data = data.train)
+summary(logit.both)
+```
+
+The stepwise regression model has distilled the full set of predictors to those most statistically significant for predicting customer attrition. It has excluded less impactful variables, potentially enhancing model performance and interpretability. When comparing to the full model, it appears the stepwise regression has retained key factors such as transaction count and revolving balance, which are crucial in understanding customer behavior.
+
+Upon examining the provided AIC and residual deviance values, it appears that both models have similar performance metrics, contrary to what might be expected. The full model does not show a marked increase in AIC or residual deviance, indicating that the additional variables it includes do not introduce unnecessary complexity or reduce the model's explanatory power.
+
+**Stepwise Model Performance**
+
+```{r}
+pred.logit_both <- predict(logit.both, newdata = data.test, type="response")
+
+condition.logit_both <- ifelse(pred.logit_both > 0.5, 1, 0)
+(confusion_matrix.logit_both <- confusionMatrix(reference = as.factor(data.test$Attrition_Flag), 
+                                                data = as.factor(condition.logit_both), 
+                                                positive = "1",
+                                                mode="everything"))
+```
+
+The model demonstrates high accuracy (90.81%) in predicting customer attrition, significantly better than random chance, as indicated by the p-value being less than 2.2e-16. Sensitivity is moderate at 58.66%, while specificity is very high at 97.05%, showing the model is particularly effective at identifying customers who will not attrite. The positive predictive value (79.42%) and negative predictive value (92.36%) are both strong. The balanced accuracy of 77.85% and an F1 score of 0.67483 reflect a reasonable balance between precision and recall. Overall, the model is quite adept at discerning the likelihood of customers leaving the bank, which is critical for informed decision-making in customer retention strategies.
+
+The stepwise model exhibits a slight improvement in sensitivity compared to the full model. This improvement indicates that the stepwise model is marginally better at correctly identifying customers who will attrite. Even a small increase in sensitivity is valuable in a banking context, as it means fewer customers who are likely to leave the bank go unnoticed.
+
+**Stepwise Model Area Under the Curve**
+
+```{r}
+auc(data.test$Attrition_Flag, pred.logit_both)
+```
+
+The AUC (Area Under the Curve) for the stepwise logistic regression model is 0.9329, which is an excellent score. An AUC close to 1 indicates that the model has a high ability to correctly classify those customers who will attrite (case = 1) and those who will not (control = 0). This high AUC score signifies that the stepwise model provides strong discriminative power in identifying the likelihood of customer attrition, which is critical for effective customer retention strategies in the banking industry.
+
+**Diagnostic Plots for Model Residuals**
+
+```{r}
+par(mfrow=c(2,2))
+plot(logit.full)
+```
+
+The "Residuals vs Fitted" plot is used to check the variance of the residuals (errors) from the model. Ideally, the residuals should be randomly scattered around the horizontal line (zero), indicating that the model's predictions are unbiased at any level of fitted values. In this plot, the residuals do not show any clear pattern, suggesting a good fit.
+
+The "Q-Q" plot compares the distribution of the residuals to a normal distribution. The points should lie approximately along the 45-degree line if the residuals are normally distributed. Here, the points largely follow the line, but some deviations are present at the ends, which might indicate slight issues with normality.
+
+The "Scale-Location" plot, also known as the "Spread-Location" plot, checks the homoscedasticity assumption --- that residuals have constant variance across all levels of the independent variables. The plot shows that the residuals' spread is relatively even, although there may be some minor inconsistencies as indicated by the slight bow-shaped pattern.
+
+The "Residuals vs Leverage" plot helps to identify influential observations that might have a disproportionately large effect on the calculation of the regression coefficients. The Cook's distance lines indicate the influence of each observation. Here, no individual points stand out past the Cook's distance threshold lines, which suggests there are no influential outliers that would unduly affect the model's performance.
+
+These plots collectively suggest that the model does not violate the key assumptions of logistic regression and that its predictions should be reliable.
+
+**Checking for Outliers**
+
+```{r}
+outliers <- which(abs(residuals(logit.full)) > 3*sd(residuals(logit.full)))
+
+```
+
+The code snippet identifies numerous outliers in the dataset, flagging data points where residuals from the logistic regression model exceed three times the standard deviation from the mean residual. This suggests the presence of substantial atypical values which could affect the model's accuracy. Such a significant number of outliers merits further investigation to understand their nature and consider appropriate adjustments to the model or data.
+
+**Excluding the outliers from the dataset**
+
+```{r}
+data.train.2 <- data.train[-outliers,]
+```
+
+**Checking for high leverage cases**
+
+```{r}
+n <- nrow(data.train.2)
+p <- ncol(data.train.2)-1
+chilev <- which(influence(logit.full)$hat > max(2*(p+1)/n, 0.5))
+chilev
+```
+
+The code checks for high leverage points in the logistic regression model. Leverage points can unduly influence the model, but the output "named integer(0)" indicates no such points were found in the data, suggesting a stable model with no single data point having an excessive impact on the fit.
+
+**Checking for high influential points**
+
+```{r}
+cooksD <- cooks.distance(logit.full)
+highCooksD <- which(cooksD > (4/(n-p-1)))
+```
+
+The code calculates Cook's distance for each observation in the logistic regression model to identify influential points, which can disproportionately affect the model's estimates. Observations with Cook's distance greater than \\( \\frac{4}{n-p-1} \\) are typically considered to be influential. Given that numerous influential points were found, it suggests that the model may be sensitive to specific data points. This could indicate either actual influential observations that merit closer inspection or potential data issues. The presence of many influential points might necessitate a deeper investigation into the data or a reconsideration of the model's specifications.
+
+**Refining Model Accuracy by Excluding Influential Data Point**
+
+```{r}
+data.train.3 <- data.train.2[-highCooksD,]
+logit.full.2 <- glm(Attrition_Flag ~ ., 
+                  data = data.train.3, 
+                  family = binomial(link = "logit"))
+summary(logit.full.2)
+
+```
+
+This code is removing observations identified as influential based on high Cook's distance from the training dataset and then refitting the logistic regression model. This process is aimed at enhancing the model's robustness by excluding data points that could unduly affect the model's estimates.
+
+The refined logistic regression model shows a reduction in both residual deviance and AIC values compared to the previous full model. This improvement indicates a better fit to the data with less unexplained variance, while maintaining model parsimony, meaning the model is achieving more with less.
+
+To evaluate the refined model's improvement after excluding outliers and influential points, we will compute essential performance metrics such as the confusion matrix, accuracy, sensitivity, specificity, and the F1 score. Additionally, we will generate residual plots for the refined model to observe changes in the residuals. This comprehensive analysis will help us quantify the model's enhancement and understand the impact of data refinement on the model's predictive accuracy for customer attrition, which is vital for informed decision-making in customer retention efforts.
+
+**Refined Model Residual Plots**\$
+
+```{r}
+par(mfrow=c(2,2))
+plot(logit.full.2)
+```
+
+The diagnostic plots for the refined model reveal that some issues persist. The "Residuals vs Fitted" plot shows a curve, hinting at potential non-linearity in the residuals, similar to the full model. The "Q-Q" plot indicates a departure from normality, with more pronounced deviations from the expected line than in the full model, suggesting that the distribution of residuals may be skewed or have heavy tails. The "Scale-Location" plot suggests possible heteroscedasticity, with residuals spreading as fitted values increase, an issue that also appeared in the full model. However, the "Residuals vs Leverage" plot demonstrates an improvement, with data points well-contained within Cook's distance, suggesting effective mitigation of influential points. In summary, while the refined model shows fewer influential points, indicating some improvement, concerns regarding non-linearity and non-normality of residuals remain when compared to the full model's residual plots.
+
+**Refined Model Performance Assessment**
+
+```{r}
+
+pred.logit_full.2 <- predict(logit.full.2, newdata = data.test, type="response")
+
+condition.logit_full.2 <- ifelse(pred.logit_full.2 > 0.5, 1, 0)
+(confusion_matrix.logit_full.2 <- confusionMatrix(reference = as.factor(data.test$Attrition_Flag), 
+                                                data = as.factor(condition.logit_full.2), 
+                                                positive = "1",
+                                                mode="everything"))
+```
+
+The refined model achieves an accuracy of 90.77%, with sensitivity at 58.05% and specificity at 97.11%. These metrics indicate a reliable model, but when compared to the full and stepwise models, the improvement in performance is not significant. The precision and F1 score, standing at 79.58% and 67.13% respectively, also do not show marked improvement. The balanced accuracy of 77.58% underscores this point. Despite refining the model by removing influential points, the gains in predictive performance are marginal, suggesting that the initial models were already capturing the essential patterns in the data effectively.
+
+In summarizing the application of logistic regression to the banking dataset, it is evident that while the models achieved commendable accuracy and specificity, the sensitivity scores remained modest. The full logistic regression model, the stepwise adjusted model, and the refined model post-outlier adjustment consistently showed high accuracy, exceeding 90% in some cases, and specificity scores were similarly robust, often surpassing 97%. These results affirm the models' proficiency in correctly identifying customers who will not attrite. However, the sensitivity scores---reflecting the models' ability to correctly identify those customers who will attrite---were consistently lower, hovering around 58%. This suggests a potential limitation in the models' capacity to capture the true positive rate effectively, which is critical for the bank's objective of accurately predicting attrition. Despite attempts to enhance model performance by excluding influential data points, improvements in sensitivity were not substantial, indicating the original models already encapsulated the primary predictive patterns within the data. The takeaway from this method is a recognition of logistic regression as a valuable predictive tool, yet one that may require supplementary techniques or data enrichment to improve sensitivity and thus more effectively meet the bank's objective of identifying at-risk customers.
+
+### Model 2: Decision Trees
+
+Decision Trees stand as a potent analytical method for addressing classification challenges like bank customer attrition. This technique segments the dataset into smaller, more manageable parts, which correspond to branches and leaves in a tree-like model. The inherent value of Decision Trees in this scenario derives from their interpretability; they provide a transparent, visual representation of decision-making processes, which is crucial for bank managers and executives seeking to understand the drivers behind customer churn. Moreover, Decision Trees are adept at capturing non-linear patterns without the need for data transformation, handling complex customer behaviors that linear models might miss. They also excel in selecting the most impactful features, highlighting critical factors that influence attrition. These models can navigate through the intricacies of variable interactions, offering a comprehensive view of how different customer attributes interplay to affect attrition risk. Given their non-parametric nature, Decision Trees do not require assumptions about the underlying data distribution, making them versatile in handling diverse datasets. In summary, applying a Decision Tree model could provide the bank with deep insights into attrition dynamics, facilitating the development of nuanced customer retention strategies.
+
+```{r}
+library(rpart)
+```
+
+**Constructing an In-depth Decision Tree for Customer Attrition Analysis**
+
+```{r}
+fit.allpred <- rpart(Attrition_Flag ~., method = "class", data = data.train,
+                  control = rpart.control(minsplit = 1, cp = 0.001))
+```
+
+The code is building a Decision Tree to classify customers as likely to attrite, using all available predictors. It is set to grow a detailed tree, allowing splits even with single observations.
+
+The intent here is to display the complexity parameter table for the decision tree model to aid in selecting the optimal tree size.
+
+```{r}
+printcp(fit.allpred) 
+```
+
+The provided CP table from the Decision Tree output highlights the variables used in predicting customer attrition and the model's performance at various complexity levels. A lower 'rel error' suggests better fit to the training data, but a minimized 'xerror' indicates robustness in cross-validation, which is essential for model generalization. The decision on pruning the tree will balance these errors, aiming for a model that captures critical patterns without overfitting, crucial for effective attrition prediction in banking.
+
+Selecting the complexity parameter (CP) that minimizes the cross-validation error,
+
+```{r}
+(cp= fit.allpred$cptable[which.min(fit.allpred$cptable[, "xerror"]), "CP"])
+(xerr = fit.allpred$cptable[which.min(fit.allpred$cptable[, "xerror"]), "xerror"])
+```
+
+The output shows the chosen CP value and its corresponding minimum cross-validation error. This minimal error suggests that at this particular CP value, the decision tree model strikes an optimal balance between complexity and predictive performance, potentially reducing the likelihood of overfitting while maintaining a robust predictive capability for unseen data. This CP value will be used to prune the tree, simplifying the model to this level of complexity to improve its generalization to new data.
+
+**Plot of Decision Tree Complexity versus Error**
+
+```{r}
+plotcp(fit.allpred)
+```
+
+This chart displays the complexity parameter (CP) versus the relative error in a decision tree model. It shows that as the size of the tree increases, the cross-validation relative error decreases sharply at first and then levels off, indicating a point of diminishing returns where additional splits do not significantly improve model performance. The dotted line marks the lowest error before the plateau, suggesting the optimal tree size for the balance between model complexity and prediction error.
+
+```{r}
+library(rpart.plot)
+```
+
+```{r}
+rpart.plot(fit.allpred, extra = "auto")
+```
+
+In this visualization, a decision tree has been generated to model customer attrition. The tree is complex, with numerous nodes representing various decisions based on customer data attributes. Each node in the tree makes a decision, leading to either another decision node or a terminal node that predicts the customer's likelihood of attrition. The warning indicates that due to the tree's complexity and the large number of nodes, the labels may overlap in the visual representation, making it challenging to discern individual nodes and paths clearly. This complexity suggests a highly detailed model that may capture subtle nuances in the data but also raises concerns about overfitting and model interpretability.
+
+**Evaluating the Decision Tree Model Performance**
+
+```{r}
+test_df <- data.frame(actual = data.test$Attrition_Flag, pred = NA)
+test_df$pred <- predict(fit.allpred, newdata = data.test, type = "class")
+# Create the confusion matrix using caret
+conf_matrix <- confusionMatrix(as.factor(test_df$pred), as.factor(test_df$actual), positive = "1")
+conf_matrix
+```
+
+The decision tree model showcases strong performance with an accuracy of 94.07%, indicating reliable predictive capabilities. Notably, the model's sensitivity or true positive rate is 80.24%, demonstrating its effectiveness in identifying customers likely to attrite. This, paired with a high specificity of 96.76%, means the model is accurate in predicting both attrition and retention. The balanced accuracy of 88.50% suggests a well-tuned model that is equally adept at identifying both classes. This robust performance suggests that the decision tree could be a valuable tool for targeting customer retention efforts in a banking context.
+
+**Pruning the Tree**
+
+```{r}
+
+prunefit.allp <- prune(fit.allpred, cp =
+    fit.allpred$cptable[which.min(fit.allpred$cptable[, "xerror"]), "CP"])
+```
+
+The decision tree is pruned to reduce complexity and prevent overfitting. Pruning is done at the complexity parameter (cp) that minimizes cross-validation error, which is likely to yield a model that generalizes better to unseen data.
+
+**Displaying the Pruned Tree**
+
+```{r}
+rpart.plot(prunefit.allp, extra = "auto")
+```
+
+This visual represents a pruned decision tree, which has been simplified to focus on the most predictive variables for customer attrition. The pruning process removes branches that have little impact on the classification outcome, aiming to improve the model's generalization to new data. This results in a more interpretable and efficient model, potentially enhancing its performance.
+
+```{r}
+#summary(prunefit.allp)
+```
+
+**Resubstitution Error Rate:**
+
+The resubstitution error rate on the training sample is calculated by multiplying the root node error with the relative error from the pruned decision tree.
+
+Resubstitution error rate = Root Node Error × rel error
+
+```{r}
+rootnode_err <- sum(data.train$Attrition_Flag==1)/nrow(data.train)
+prelerr = prunefit.allp$cptable[which.min(prunefit.allp$cptable[, "rel error"]), "rel error"]
+(presub.err_rate <- rootnode_err*prelerr) 
+```
+
+The computed resubstitution error rate is **`0.0333251`**. This suggests that after pruning the tree to avoid overfitting, approximately 3.33% of the training data would still be misclassified by the model, indicating the tree's performance on the data it was trained on.
+
+**Cross-validation Error Rate:**
+
+Cross-validation error rate = Root Node Error × xerror
+
+```{r}
+rootnode_err <- sum(data.train$Attrition_Flag==1)/nrow(data.train)
+pxerr = prunefit.allp$cptable[which.min(prunefit.allp$cptable[, "xerror"]), "xerror"]
+(pcv.err_rate <- rootnode_err*pxerr)
+```
+
+The computed cross-validation error rate is **`0.05196248`**. This represents the expected proportion of misclassifications if the model were applied to new, unseen data, based on the pruning parameter (cp) chosen from cross-validation.
+
+**Pruned Tree Model Performance**
+
+```{r}
+test_df <- data.frame(actual = data.test$Attrition_Flag, pred = NA)
+test_df$prediction <- predict(prunefit.allp, newdata = data.test, type = "class")
+conf_matrix_pruned_tree <- confusionMatrix(as.factor(test_df$prediction), as.factor(test_df$actual), positive = "1")
+conf_matrix_pruned_tree
+```
+
+The pruned decision tree model exhibits a modest enhancement in classification performance over its unpruned counterpart. A slight uptick in accuracy from 0.9407 to 0.9437 and an improved Kappa statistic from 0.7796 to 0.7906 both suggest a more reliable prediction after pruning. Sensitivity shows a marginal increase, indicating a better detection of true positives. The specificity and predictive values also see slight improvements, reinforcing the model's precision and reliability in classifying both positive and negative cases. The balanced accuracy rate, a critical measure of overall performance, has risen from 0.8850 to 0.8904, highlighting a more balanced approach in predicting outcomes across classes.
+
+**Missclassification Error Rate**:
+
+The misclassification error rate is a metric used to quantify the proportion of predictions that a classification model gets wrong. It is calculated as the sum of the instances where the predicted class does not match the true class (both false positives and false negatives), divided by the total number of instances.
+
+```{r}
+# Missclassification error rate:
+misclassification_error <- sum(conf_matrix_pruned_tree$table[2,1], conf_matrix_pruned_tree$table[1,2]) /
+                          sum(conf_matrix_pruned_tree$table)
+misclassification_error
+
+```
+
+In the provided output, the misclassification error rate is **`0.0562963`**. This value indicates that approximately 5.63% of the predictions made by the pruned decision tree model were incorrect. This low error rate suggests that the model is performing well, accurately predicting the correct class for a high percentage of the instances. It is a direct measure of the model's error and is a complement to the accuracy rate, which in this case is approximately 94.37%.
+
+### Model 3: Random Forest
+
+Random Forest is an ensemble learning technique that constructs a multitude of decision trees during training and outputs the mode of the classes (classification) or mean prediction (regression) of the individual trees. It is known for its high accuracy, ability to deal with unbalanced and missing data, and its feature of measuring the importance of each variable in classification.
+
+In the context of bank customer attrition, Random Forest is particularly relevant due to its robustness in handling complex, non-linear relationships that often exist in customer data. It can also process large datasets efficiently, which is common in banking, and provide insights into which factors contribute most to customer churn. By identifying these key variables, banks can target customer retention strategies more effectively. The model's ensemble approach reduces overfitting, making it a reliable choice for predicting which customers are at risk of leaving, thus enabling timely and informed decision-making to enhance customer retention strategies.
+
+Importing the ranger library
+
+```{r}
+library(ranger)
+```
+
+```{r}
+fit.rf <- ranger(Attrition_Flag ~ ., data = data.train, 
+                   importance = 'impurity', mtry = 3)
+print(fit.rf)
+```
+
+The output displayed suggests the execution of a random forest model, utilizing the 'ranger' package within R. This model targets the prediction of the 'Attrition_Flag' outcome based on the dataset 'data.train'. With a configuration of 500 trees and a maximum of three variables tried at each split (mtry = 3), the model emphasizes variable importance based on impurity measures. The reported out-of-bag (OOB) prediction error is 3.85%, which is a direct assessment of prediction accuracy on the training set itself, using each tree to predict the data not included in its bootstrap sample. This relatively low OOB error rate hints at a robust model with potentially good predictive performance. However, validation on an independent test set is crucial to evaluate the model's ability to generalize beyond the training data.
+
+```{r}
+library(vip)
+```
+
+**Variable Importance Analysis**
+
+```{r}
+(v1 <- vi(fit.rf))
+```
+
+The top two variables by importance are **`Total_Trans_Amt`** and **`Total_Trans_Ct`**, indicating they are the most significant predictors in the model. Variables related to transaction amount, count, and changes over time are highlighted as key factors, with other customer-related metrics like revolving balance, utilization ratio, and age following in importance. The data suggests that transactional behavior is more predictive of the model's target variable than customer demographic data.
+
+```{r}
+vip(v1)
+```
+
+```{r}
+pred <- predict(fit.rf, data = data.test)
+test_df <- data.frame(actual = data.test$Attrition_Flag, pred = NA)
+test_df$predictions <- pred$predictions
+conf_matrix_rf <- confusionMatrix(as.factor(test_df$predictions), as.factor(test_df$actual), positive = "1")
+conf_matrix_rf
+```
+
+The performance metrics for the random forest model on bank customer data indicate strong predictive power. With an accuracy of 95.46% and a Kappa statistic of 0.8208, the model is highly reliable and shows substantial agreement beyond chance. High specificity (98.94%) indicates excellent identification of existing customers (class 0), while good sensitivity (77.51%) means the model is also reasonably effective at identifying customers likely to attrite (class 1). The positive predictive value of 93.41% and the negative predictive value of 95.78% suggest the model is robust in its predictions across both classes. The balanced accuracy of 88.22% demonstrates the model generalizes well for both classes despite any imbalance in the dataset. Overall, the model appears to be highly effective for this analysis.
+
+Calculating Recall, Precision, and F1 Scores for the Random Forest Model:
+
+```{r}
+library(caret)
+
+recall <- sensitivity(conf_matrix_rf$table, positive = "1")
+precision <- precision(conf_matrix_rf$table, positive = "1")
+f1_score <- F_meas(conf_matrix_rf$table, positive = "1")
+
+# Print the metrics
+print(paste("Recall:", recall))
+print(paste("Precision:", precision))
+print(paste("F1 Score:", f1_score))
+  
+```
+
+The recall is 0.775, indicating the model correctly identifies 77.5% of the positive class. The precision is high at 0.958, showing that 95.8% of the instances predicted as positive are indeed positive. The F1 score, which balances recall and precision, is also high at 0.973. These metrics collectively suggest that the model has a strong performance in identifying the positive class while maintaining a high level of accuracy in its predictions.
+
+### Model 4: Gradient Boosting
+
+Gradient Boosting is a powerful machine learning technique that builds predictive models in the form of an ensemble of weak predictive models, typically decision trees. It optimizes for a loss function in a gradient descent manner, allowing for the sequential improvement of models by focusing on the mistakes of previous iterations.
+
+For bank customer attrition data, Gradient Boosting is particularly effective due to its ability to capture complex non-linear patterns and interactions between features. It's adept at handling varied types of data, which is often the case with the multitude of variables involved in customer attrition, such as demographics, transaction behavior, and product usage. Its iterative refinement helps in accurately pinpointing customers at high risk of churn. By progressively learning from the nuances in customer data, Gradient Boosting can yield highly accurate predictions, making it an invaluable tool for banks aiming to reduce churn and tailor their customer retention strategies effectively.
+
+Importing the xgboost and Matrix packages in r.
+
+```{r}
+library(xgboost)
+library(Matrix)
+```
+
+The following code is intended to prepare the data for gradient boosting models. **`xgboost`** requires numerical input, so categorical variables must be converted into a numerical format, which is achieved through one-hot encoding. The **`sparse.model.matrix`** function from the **`Matrix`** package creates a sparse matrix of predictors for the training and testing datasets, excluding the target variable 'Attrition_Flag'. This encoding and matrix transformation is essential for efficiently handling categorical data within **`xgboost`**, which can then be used to predict customer attrition.
+
+```{r}
+# Transform the predictor matrix using dummy (or indicator or one-hot) encoding 
+matrix_predictors.train <- 
+  as.matrix(sparse.model.matrix(Attrition_Flag ~., data = data.train))[, -1]
+matrix_predictors.test <- 
+  as.matrix(sparse.model.matrix(Attrition_Flag ~., data = data.test))[, -1]
+```
+
+We prepare the training and testing datasets for the XGBoost algorithm by transforming the predictor matrices into a dense numerical format required by XGBoost. Concurrently, we convert the target variable, 'Attrition_Flag', from categorical to numerical to ensure compatibility with the algorithm's functions. These steps result in the creation of \`xgb.DMatrix\` objects for both datasets, which are optimized for gradient boosting computations. This preparation is crucial for the subsequent model training and evaluation phases within the XGBoost framework.
+
+```{r}
+# Train dataset
+pred.train.gbm <- data.matrix(matrix_predictors.train) # predictors only
+#convert factor to numeric
+data.train.gbm <- as.numeric(as.character(data.train$Attrition_Flag)) 
+dtrain <- xgb.DMatrix(data = pred.train.gbm, label = data.train.gbm)
+# Test dataset
+pred.test.gbm <- data.matrix(matrix_predictors.test) # predictors only
+ #convert factor to numeric
+data.test.gbm <- as.numeric(as.character(data.test$Attrition_Flag))
+dtest <- xgb.DMatrix(data = pred.test.gbm, label = data.test.gbm)
+```
+
+We configure the parameters and evaluation settings for training the XGBoost model. A watchlist is created to monitor the training and testing process, allowing us to evaluate the model's performance on both datasets throughout the training iterations. Parameters are set, including a maximum tree depth of 2 to control overfitting, a learning rate (eta) of 1 for faster convergence, and parallel processing with 2 threads to speed up computation. The objective is specified as 'binary:logistic' for binary classification, and the evaluation metric is set to 'AUC' to assess the model's ability to rank predictions rather than output hard probabilities.
+
+```{r}
+watchlist <- list(train = dtrain, test = dtest)
+param <- list(max_depth = 2, eta = 1, nthread = 2,
+              objective = "binary:logistic", eval_metric = "auc")
+```
+
+We train the XGBoost model, iterating through seven rounds, and monitor the Area Under the Curve (AUC) metric for both the training and test datasets. This metric provides insight into the model's ability to distinguish between the classes across each training round.
+
+```{r}
+model.xgb <- xgb.train(param, dtrain, nrounds = 7, watchlist)
+```
+
+Summarizing the output, the model exhibits a consistent improvement in AUC with each round for both datasets. The training AUC increases from 0.862 to 0.966, while the test AUC also improves from 0.867 to 0.957. This increasing trend suggests that the model is learning effectively and generalizes well to unseen data, indicating a robust predictive performance.
+
+**Predicting on train dataset**:
+
+```{r}
+pred.y.train <- predict(model.xgb, pred.train.gbm)
+prediction.train <- as.numeric(pred.y.train > 0.5)
+# Measure prediction accuracy on train data
+(tab<-table(data.train.gbm, prediction.train))
+```
+
+We generate predictions on the training dataset using the XGBoost model and then classify these predictions into binary outcomes based on a 0.5 threshold. Subsequently, we assess the model's prediction accuracy on the training data by constructing a confusion matrix.
+
+The confusion matrix reveals that out of the total predictions made for the training data, 6,644 are true negatives (class 0 correctly predicted as 0) and 974 are true positives (class 1 correctly predicted as 1). However, there are 160 false positives (class 0 incorrectly predicted as 1) and 324 false negatives (class 1 incorrectly predicted as 0). This matrix allows us to evaluate the model's classification performance on the training data, considering both the correct predictions and the errors made.
+
+```{r}
+threshold <- 0.5 
+pred.y = predict(model.xgb, pred.test.gbm)
+prediction <- as.numeric(pred.y > threshold) # Convert probabilities to binary predictions
+
+# Now, create the test data frame
+test_df <- data.frame(actual = data.test$Attrition_Flag, prediction = prediction)
+
+# Convert both actual and predicted to factors assuming '1' is the positive class
+test_df$actual <- as.factor(test_df$actual)
+test_df$prediction <- as.factor(test_df$prediction)
+
+# Recreate the confusion matrix
+xg.conf_matrix <- confusionMatrix(test_df$prediction, test_df$actual, positive = "1")
+print(xg.conf_matrix)
+
+```
+
+The XGBoost model demonstrates commendable performance on the test data, as evidenced by the provided metrics. It achieves an accuracy of 93.53%, with a 95% confidence interval between 92.37% and 94.56%, underscoring the model's reliability in making predictions. The model's Kappa statistic is 0.7484, indicating a substantial agreement beyond chance. Sensitivity, or the true positive rate, is 73.25%, suggesting a robust capability to identify the positive class. Specificity is at 97.46%, showing excellent recognition of the negative class.
+
+The positive predictive value, which is the precision, stands at 84.86%, while the negative predictive value is 94.95%, both reflecting high predictive accuracy for positive and negative classes, respectively.
+
+**Calculating Recall, Precision, and F1 Scores for the Gradient Boost Model**:
+
+```{r}
+recall <- sensitivity(xg.conf_matrix$table, positive = "1")
+
+# Calculate precision (positive predictive value)
+precision <- posPredValue(xg.conf_matrix$table, positive = "1")
+
+# Calculate F1 score
+f1_score <- (2 * precision * recall) / (precision + recall)
+
+# Print the metrics
+print(paste("Recall:", recall))
+print(paste("Precision:", precision))
+print(paste("F1 Score:", f1_score))
+```
+
+The model's output shows a recall of 0.732, precision of 0.849, and an F1 score of 0.787, indicating a balanced performance in terms of sensitivity and precision.
