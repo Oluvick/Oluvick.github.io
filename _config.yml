@@ -1,4 +1,4 @@
-title: Your Name's Portfolio
+#title: Your Name's Portfolio
 email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
   Welcome to my professional portfolio. Here you'll find details about my work experience, projects, and skills.
