@@ -1,2 +1,51 @@
+title: Your Name's Portfolio
+email: your-email@example.com
+description: >- # this means to ignore newlines until "baseurl:"
+  Welcome to my professional portfolio. Here you'll find details about my work experience, projects, and skills.
+baseurl: "" # the subpath of your site, e.g., /blog
+url: "http://yourusername.github.io" # the base hostname & protocol for your site, e.g., http://example.com
+
+# Build settings
+markdown: kramdown
 theme: minima
-title: Ilayda Bekircan
+plugins:
+  - jekyll-feed
+
+# About/User information
+name: Your Name
+bio: 'Your professional bio or statement.'
+picture: 'path-to-your-picture.jpg' # relative path to a picture of yourself
+
+# Social links (Optional)
+twitter_username: yourusername  # DO NOT include the @ character, or else the build will fail!
+github_username:  yourusername
+linkedin_username: yourusername
+
+# Navigation links
+nav:
+  - title: "Home"
+    url: /
+  - title: "About"
+    url: /about/
+  - title: "Work"
+    url: /work/
+  - title: "Projects"
+    url: /projects/
+  - title: "Contact"
+    url: /contact/
+
+# Include any additional Jekyll plugins here.
+gems:
+  - jekyll-feed # Creates an Atom feed
+
+# Exclude from processing.
+# The following items will not be processed, by default. Create a custom list to override the default setting.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
