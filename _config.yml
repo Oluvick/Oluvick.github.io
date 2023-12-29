@@ -1,5 +1,5 @@
 #title: Your Name's Portfolio
-email: your-email@example.com
+email: gbemisolagboola@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Welcome to my professional portfolio. Here you'll find details about my work experience, projects, and skills.
 baseurl: "" # the subpath of your site, e.g., /blog
@@ -12,14 +12,13 @@ plugins:
   - jekyll-feed
 
 # About/User information
-name: Your Name
+name: Victoria Agboola
 bio: 'Your professional bio or statement.'
 picture: 'path-to-your-picture.jpg' # relative path to a picture of yourself
 
 # Social links (Optional)
-twitter_username: yourusername  # DO NOT include the @ character, or else the build will fail!
-github_username:  yourusername
-linkedin_username: yourusername
+github_username:  Oluvick
+linkedin_username: Ms_milar
 
 # Navigation links
 nav:
