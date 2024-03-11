@@ -12,12 +12,6 @@ permalink: /projects/
 
 Developed a tool for optimizing supply chain processes, resulting in estimated quarterly savings of $304k. [Read more](link-to-detailed-project-page).
 
-## Analytical Dashboards for Real-Time Performance Monitoring
-
-![Dashboard Example](path-to-dashboard-image.jpg)
-
-Created Tableau dashboards for monitoring operational performance, which facilitated strategic decision-making. [View Dashboard](link-to-dashboard-demo).
-
 ## Predictive Model for Credit Card Attrition
 
 ![Model Output](path-to-model-image.jpg)
