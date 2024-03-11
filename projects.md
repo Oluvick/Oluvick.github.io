@@ -4,21 +4,25 @@ title: Projects
 permalink: /projects/
 ---
 
-# Projects by Victoria Agboola
-
-Below are some of the key projects I've worked on, demonstrating my skills in data science and process engineering.
+# Data Science Projects
 
 ## Inbound Planning Tool at Walmart
 
-Developed a tool resulting in an estimated quarterly savings of $304k by optimizing the supply chain process.
+![Inbound Planning Tool](path-to-project-image.jpg)
 
-## Analytical Dashboards for Real-time Performance Monitoring
+Developed a tool for optimizing supply chain processes, resulting in estimated quarterly savings of $304k. [Read more](link-to-detailed-project-page).
 
-Built dashboards using Tableau to facilitate strategic decision-making and monitor operational performance in real-time.
+## Analytical Dashboards for Real-Time Performance Monitoring
+
+![Dashboard Example](path-to-dashboard-image.jpg)
+
+Created Tableau dashboards for monitoring operational performance, which facilitated strategic decision-making. [View Dashboard](link-to-dashboard-demo).
 
 ## Predictive Model for Credit Card Attrition
 
-Developed a model using CART, Binary Logit, Random Forest, and XGBoost achieving 94.07% accuracy, which informed retention strategies.
+![Model Output](path-to-model-image.jpg)
 
-For more detailed information on each project, feel free to reach out or connect with me on [LinkedIn](https://www.linkedin.com/in/victoria-agboola/).
+Built a predictive model using CART, Binary Logit, Random Forest, and XGBoost achieving 94.07% accuracy. [Explore the Model](link-to-model-repository).
+
+Feel free to explore the repositories and reach out if you have questions or want to discuss potential collaborations.
 
