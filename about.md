@@ -6,29 +6,24 @@ permalink: /about/
 
 # About Victoria Agboola
 
-I'm a Data Science graduate student at the University of Connecticut, with a passion for leveraging analytical skills and an industrial engineering background to drive data-driven decision-making and process optimization.
+![Professional Headshot](path-to-your-image.jpg)
 
 ## Education
 
 - **MSc. Data Science**, University of Connecticut, Expected July 2024
 - **B.S. Industrial Engineering**, Morgan State University, December 2020
 
-## Work Experience
+## Experience
 
-### Walmart Supply Chain ACC Network (Jan 2022 – Aug 2023)
-- Process Engineer
+- **Process Engineer**, Walmart Supply Chain ACC Network, Jan 2022 – Aug 2023
+- **Process Lead Intern**, SUEZ Water Technologies and Solutions (WTS), June 2021 – Dec 2021
 
-### SUEZ Water Technologies and Solutions (WTS) (June 2021 – Dec 2021)
-- Process Lead Intern
+## Skills
 
-For more details on my work experience and projects, visit the [Projects](./projects.md) page.
+- **Programming**: Python, R
+- **Data Analysis**: Statistical Analysis, Machine Learning
+- **Tools**: SQL, Tableau, Excel
+- **Frameworks**: TensorFlow, scikit-learn
 
-## Skills & Qualifications
-
-- Data Analysis & Statistical Techniques
-- Programming & Data Manipulation: Python, R
-- Data Visualization & Machine Learning
-- Database & Tool Proficiency: SQL, Google Big Query, Tableau
-
-Let's connect on [LinkedIn](https://www.linkedin.com/in/victoria-agboola/).
+I'm always excited to connect with fellow data enthusiasts and professionals. Feel free to [reach out](mailto:gbemisolagboola@gmail.com) or connect with me on [LinkedIn](https://www.linkedin.com/in/victoria-agboola/).
 
