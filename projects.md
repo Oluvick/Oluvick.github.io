@@ -8,7 +8,6 @@ permalink: /projects/
 
 ## Predictive Model for Credit Card Attrition
 
-
 ![Model Output](images/Decision_tree.png){: style="width: 50%;" }
 
 Built a predictive model using CART, Binary Logit, Random Forest, and XGBoost achieving 94.07% accuracy. [Explore the Model](https://github.com/Oluvick/Oluvick.github.io/tree/statistical_modeling).
