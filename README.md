@@ -1,4 +1,4 @@
-# Victoria Agboola's Data Science Portfolio
+# Data Scientist
 
 Welcome to my professional portfolio, showcasing projects and accomplishments in Data Science and Industrial Engineering. This site reflects my journey, skills, and the impact of my work.
 
