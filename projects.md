@@ -6,12 +6,6 @@ permalink: /projects/
 
 # Data Science Projects
 
-## Inbound Planning Tool at Walmart
-
-![Inbound Planning Tool](path-to-project-image.jpg)
-
-Developed a tool for optimizing supply chain processes, resulting in estimated quarterly savings of $304k. [Read more](link-to-detailed-project-page).
-
 ## Predictive Model for Credit Card Attrition
 
 ![Model Output](path-to-model-image.jpg)
