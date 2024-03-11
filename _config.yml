@@ -1,50 +1,7 @@
-#title: Your Name's Portfolio
+title:  Victoria Agboola
 email: gbemisolagboola@gmail.com
-description: >- # this means to ignore newlines until "baseurl:"
-  Welcome to my professional portfolio. Here you'll find details about my work experience, projects, and skills.
-baseurl: "" # the subpath of your site, e.g., /blog
-url: "http://yourusername.github.io" # the base hostname & protocol for your site, e.g., http://example.com
-
-# Build settings
-markdown: kramdown
-theme: minima
-plugins:
-  - jekyll-feed
-
-# About/User information
-name: Victoria Agboola
-bio: 'Your professional bio or statement.'
-picture: 'path-to-your-picture.jpg' # relative path to a picture of yourself
-
-# Social links (Optional)
-github_username:  Oluvick
-linkedin_username: Ms_milar
-
-# Navigation links
-nav:
-  - title: "Home"
-    url: /
-  - title: "About"
-    url: /about/
-  - title: "Work"
-    url: /work/
-  - title: "Projects"
-    url: /projects/
-  - title: "Contact"
-    url: /contact/
-
-# Include any additional Jekyll plugins here.
-gems:
-  - jekyll-feed # Creates an Atom feed
-
-# Exclude from processing.
-# The following items will not be processed, by default. Create a custom list to override the default setting.
-exclude:
-  - Gemfile
-  - Gemfile.lock
-  - node_modules
-  - vendor/bundle/
-  - vendor/cache/
-  - vendor/gems/
-  - vendor/ruby/
-
+logo: 
+#description: text below image
+show_downloads: true
+github_username:  Oluvicky
+theme: jekyll-theme-minimal
