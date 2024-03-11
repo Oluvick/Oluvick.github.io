@@ -1,7 +1,15 @@
-title:  Victoria Agboola
+title: Victoria Agboola
 email: gbemisolagboola@gmail.com
-logo: images/IMG_2822.jpg
-#description: text below image
+description: >- # this means to ignore newlines until "baseurl:"
+  A Data Science graduate student's portfolio highlighting projects, skills, and industrial engineering insights.
 
-github_username:  Oluvicky
-theme: jekyll-theme-minimal
+url: "https://<username>.github.io" # your GitHub Pages URL
+
+theme: minima # This is a simple and straightforward theme, but you can change it to any theme you prefer
+
+# Add theme-specific settings here. This varies by theme, so check your theme's documentation.
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
