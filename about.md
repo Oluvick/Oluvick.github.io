@@ -6,7 +6,7 @@ permalink: /about/
 
 # About Victoria Agboola
 
-![Professional Headshot](path-to-your-image.jpg)
+
 
 ## Education
 
