@@ -10,8 +10,8 @@ I'm a Data Science graduate student at the University of Connecticut, with a pas
 
 ## Education
 
-- **MSc. Data Science**, University of Connecticut, Expected July 2024, GPA: 3.89
-- **B.S. Industrial Engineering**, Morgan State University, December 2020, GPA: 3.69
+- **MSc. Data Science**, University of Connecticut, Expected July 2024
+- **B.S. Industrial Engineering**, Morgan State University, December 2020
 
 ## Work Experience
 
