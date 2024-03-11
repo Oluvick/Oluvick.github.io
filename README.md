@@ -1,13 +1,20 @@
-# Data Scientist
+# Welcome to My Data Science Portfolio
 
-Welcome to my professional portfolio, showcasing projects and accomplishments in Data Science and Industrial Engineering. This site reflects my journey, skills, and the impact of my work.
+I'm Victoria Agboola, a passionate Data Science student with a background in Industrial Engineering. This portfolio is a showcase of my journey, from analytics projects to optimizing processes in supply chain management.
 
-## Quick Links
+## Features
 
-- [About Me](./about.md)
-- [Projects](./projects.md)
-- [LinkedIn Profile](https://www.linkedin.com/in/victoria-agboola/)
+- [About Me](about.md) - Learn more about my academic and professional background.
+- [Projects](projects.md) - Dive into my project portfolio demonstrating real-world problem-solving.
+- [LinkedIn](https://www.linkedin.com/in/victoria-agboola/) - Connect with me on LinkedIn.
 
-Thank you for visiting, and I look forward to connecting!
+Thank you for visiting, and feel free to [get in touch](mailto:gbemisolagboola@gmail.com) or view [my GitHub profile](https://github.com/username).
+
+![Victoria Agboola](path-to-your-professional-image.jpg) # replace with the path to your image
+
+---
+*This site is powered by [GitHub Pages](https://pages.github.com/).*
+
+
 
 
