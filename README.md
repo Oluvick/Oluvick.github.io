@@ -10,7 +10,7 @@ I'm Victoria Agboola, a passionate Data Science student with a background in Ind
 
 Thank you for visiting, and feel free to [get in touch](mailto:gbemisolagboola@gmail.com) or view [my GitHub profile](https://github.com/Oluvick).
 
-![Victoria Agboola](images/IMG_6576.jpeg) # replace with the path to your image
+
 
 ---
 *This site is powered by [GitHub Pages](https://pages.github.com/).*
